@@ -3,16 +3,20 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import Anthropic from '@anthropic-ai/sdk';
 
-// Validate API key presence
-if (!process.env.ANTHROPIC_API_KEY) {
-  throw new Error('ANTHROPIC_API_KEY is not configured');
-}
-
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 export async function POST(request: Request) {
+  // Validate API key presence
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('ANTHROPIC_API_KEY is not configured');
+    return NextResponse.json(
+      { error: 'Server configuration error' },
+      { status: 500 }
+    );
+  }
+
   try {
     const { url } = await request.json();
 

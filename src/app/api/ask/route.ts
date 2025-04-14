@@ -2,17 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getArticleContent } from '../../utils/articleExtractor';
 import Anthropic from '@anthropic-ai/sdk';
 
-// Validate API key presence
-if (!process.env.ANTHROPIC_API_KEY) {
-  throw new Error('ANTHROPIC_API_KEY is not configured');
-}
-
-// Initialize Anthropic client
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 export async function POST(request: NextRequest) {
+  // Validate API key presence
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('ANTHROPIC_API_KEY is not configured');
+    return NextResponse.json(
+      { error: 'Server configuration error' },
+      { status: 500 }
+    );
+  }
+
   try {
     const { url, question } = await request.json();
 
