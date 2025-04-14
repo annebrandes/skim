@@ -164,15 +164,15 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6 flex-grow">
-        <div className="bg-white">
+      <main className="max-w-4xl w-full mx-auto px-4 py-6 flex-grow">
+        <div className="bg-white w-full">
           {/* Wikipedia-style article title */}
-          <h1 className="text-3xl font-serif font-normal text-[#202122] border-b border-[#a2a9b1] pb-2 mb-4">
+          <h1 className="text-3xl font-serif font-normal text-[#202122] border-b border-[#a2a9b1] pb-2 mb-4 w-full">
             {articleTitle}
           </h1>
           
           {/* Wikipedia-style form */}
-          <form onSubmit={handleSubmit} className="mb-6">
+          <form onSubmit={handleSubmit} className="mb-6 w-full">
             <div className="mb-4">
               <label htmlFor="url" className="block text-sm font-medium text-[#202122] mb-1">
                 Article URL
