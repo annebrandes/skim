@@ -159,7 +159,7 @@ export default function Home() {
             <h1 className="text-2xl font-serif text-[#202122]"> Skimmer </h1>
           </div>
           <div className="text-sm text-[#54595d]">
-            <a href="#" className="hover:underline">Help</a>
+            <a href="#" className="hover:underline">About</a>
           </div>
         </div>
       </header>
