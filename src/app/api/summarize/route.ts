@@ -3,14 +3,17 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import Anthropic from '@anthropic-ai/sdk';
 
+const apiKey = process.env.ANTHROPIC_API_KEY;
+console.log('API Key present:', !!apiKey); // Safe logging, doesn't expose the key
+
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: apiKey!, // Use non-null assertion only after validation
 });
 
 export async function POST(request: Request) {
-  // Validate API key presence
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.error('ANTHROPIC_API_KEY is not configured');
+  // Validate API key presence and format
+  if (!apiKey || !apiKey.startsWith('sk-')) {
+    console.error('Invalid or missing ANTHROPIC_API_KEY configuration');
     return NextResponse.json(
       { error: 'Server configuration error' },
       { status: 500 }
