@@ -7,12 +7,27 @@ export default function Home() {
   const [summary, setSummary] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [articleTitle, setArticleTitle] = useState('Article Summarizer');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSummary('');
+    
+    // Extract a title from the URL
+    try {
+      const urlObj = new URL(url);
+      const hostname = urlObj.hostname.replace('www.', '');
+      const pathname = urlObj.pathname.split('/').filter(Boolean).pop() || '';
+      const extractedTitle = pathname 
+        ? pathname.replace(/-/g, ' ').replace(/\./g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+        : hostname;
+      
+      setArticleTitle(extractedTitle || 'Article Summary');
+    } catch (err) {
+      setArticleTitle('Article Summary');
+    }
 
     try {
       const response = await fetch('/api/summarize', {
@@ -37,50 +52,77 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen p-4 md:p-8 bg-gray-50">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-800">
-          Article Summarizer
-        </h1>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex flex-col space-y-2">
-            <label htmlFor="url" className="text-sm font-medium text-gray-700">
-              Article URL
-            </label>
-            <input
-              type="url"
-              id="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com/article"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
+    <div className="min-h-screen bg-white">
+      {/* Wikipedia-style header */}
+      <header className="bg-[#f6f6f6] border-b border-[#a2a9b1]">
+        <div className="max-w-4xl mx-auto px-4 py-2 flex items-center">
+          <div className="flex-1">
+            <h1 className="text-2xl font-serif text-[#202122]">{articleTitle}</h1>
           </div>
+          <div className="text-sm text-[#54595d]">
+            <a href="#" className="hover:underline">Help</a>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-6">
+        <div className="bg-white">
+          {/* Wikipedia-style article title */}
+          <h1 className="text-3xl font-serif font-normal text-[#202122] border-b border-[#a2a9b1] pb-2 mb-4">
+            {articleTitle}
+          </h1>
           
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400"
-          >
-            {loading ? 'Generating Summary...' : 'Generate Summary'}
-          </button>
-        </form>
+          {/* Wikipedia-style form */}
+          <form onSubmit={handleSubmit} className="mb-6">
+            <div className="mb-4">
+              <label htmlFor="url" className="block text-sm font-medium text-[#202122] mb-1">
+                Article URL
+              </label>
+              <input
+                type="url"
+                id="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://example.com/article"
+                className="w-full px-3 py-2 border border-[#a2a9b1] rounded focus:outline-none focus:ring-1 focus:ring-[#36c]"
+                required
+              />
+            </div>
+            
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-[#36c] text-white py-1 px-3 rounded border border-[#36c] hover:bg-[#447ff5] disabled:bg-[#a2a9b1] disabled:border-[#a2a9b1]"
+            >
+              {loading ? 'Generating Summary...' : 'Generate Summary'}
+            </button>
+          </form>
 
-        {error && (
-          <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
-            {error}
-          </div>
-        )}
+          {error && (
+            <div className="mb-4 p-3 bg-[#fef6f6] border border-[#ffa7a7] text-[#d33] rounded">
+              {error}
+            </div>
+          )}
 
-        {summary && (
-          <div className="mt-8 p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Summary</h2>
-            <p className="text-gray-600 whitespace-pre-wrap">{summary}</p>
-          </div>
-        )}
-      </div>
-    </main>
+          {summary && (
+            <div className="bg-white">
+              <h2 className="text-xl font-serif font-normal text-[#202122] border-b border-[#a2a9b1] pb-2 mb-4">
+                Summary
+              </h2>
+              <div className="prose prose-sm max-w-none">
+                <p className="text-[#202122] leading-relaxed">{summary}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Wikipedia-style footer */}
+      <footer className="bg-[#f6f6f6] border-t border-[#a2a9b1] mt-8">
+        <div className="max-w-4xl mx-auto px-4 py-3 text-sm text-[#54595d]">
+          <p>This page was last edited on {new Date().toLocaleDateString()}</p>
+        </div>
+      </footer>
+    </div>
   );
 }
