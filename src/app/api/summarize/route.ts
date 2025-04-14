@@ -40,27 +40,47 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate summary using Claude
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20240620',
-      max_tokens: 1000,
-      messages: [
-        {
-          role: 'user',
-          content: `Please write a summary of this article titled ${title} and the content is ${content}. Structure the summary into three sections: 1. Summary, 2. Thesis and supporting evidence, 3. Context of this post in broader discussion, and 4. Give a rating of the article from 1 to 10 focusing on areas for improvement. `
+    // Create a streaming response
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          // Generate summary using Claude with streaming
+          const stream = await anthropic.messages.create({
+            model: 'claude-3-5-sonnet-20240620',
+            max_tokens: 1000,
+            stream: true,
+            messages: [
+              {
+                role: 'user',
+                content: `Please write a summary of this article titled ${title} and the content is ${content}. Structure the summary into three sections: 1. Summary, 2. Thesis and supporting evidence, 3. Context of this post in broader discussion, and 4. Give a rating of the article from 1 to 10 focusing on areas for improvement. Format the response with markdown for better readability.`
+              }
+            ]
+          });
+
+          // Process the stream
+          for await (const chunk of stream) {
+            if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+              const text = chunk.delta.text;
+              controller.enqueue(encoder.encode(text));
+            }
+          }
+          
+          controller.close();
+        } catch (error) {
+          console.error('Streaming error:', error);
+          controller.error(error);
         }
-      ]
+      }
     });
 
-    // Access the text content correctly based on the Anthropic SDK types
-    const summaryText = message.content[0].type === 'text' 
-      ? message.content[0].text 
-      : 'Failed to generate summary';
-
-    return NextResponse.json({
-      summary: summaryText
+    // Return the streaming response
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Transfer-Encoding': 'chunked',
+      },
     });
-
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json(
