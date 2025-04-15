@@ -51,7 +51,8 @@ export default function Home() {
         : hostname;
       
       setArticleTitle(extractedTitle || 'Article Summary');
-    } catch (err) {
+    } catch (error) {
+      console.error('Error extracting title:', error);
       setArticleTitle('Article Summary');
     }
 
@@ -86,7 +87,8 @@ export default function Home() {
         const text = new TextDecoder().decode(value);
         setSummary(prev => prev + text);
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Error generating summary:', error);
       setError('Failed to generate summary. Please try again.');
     } finally {
       setLoading(false);
@@ -144,7 +146,8 @@ export default function Home() {
           return updated;
         });
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Error getting answer:', error);
       setQuestionError('Failed to get answer. Please try again.');
     } finally {
       setAskingQuestion(false);
