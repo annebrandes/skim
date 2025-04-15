@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import AboutPopup from './components/AboutPopup';
 
 export default function Home() {
   const [url, setUrl] = useState('');
@@ -10,6 +11,7 @@ export default function Home() {
   const [error, setError] = useState('');
   const [articleTitle, setArticleTitle] = useState('Drop link into skimmer');
   const summaryRef = useRef<HTMLDivElement>(null);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
   
   // New state for questions
   const [question, setQuestion] = useState('');
@@ -159,10 +161,20 @@ export default function Home() {
             <h1 className="text-2xl font-serif text-[#202122]"> Skimmer </h1>
           </div>
           <div className="text-sm text-[#54595d]">
-            <a href="#" className="hover:underline">About</a>
+            <button 
+              onClick={() => setIsAboutOpen(true)}
+              className="hover:underline"
+            >
+              About
+            </button>
           </div>
         </div>
       </header>
+
+      <AboutPopup 
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
+      />
 
       <main className="max-w-4xl w-full mx-auto px-4 py-6 flex-grow">
         <div className="bg-white w-full">
